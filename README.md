@@ -372,7 +372,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-**Your Name** - [your.email@example.com](mailto:your.email@example.com)
+**Your Name** - [gaurav.marothia@outlook.com](mailto:your.email@example.com)
 
 **Project Link:** [https://github.com/yourprofile/selenium-pytest-framework](https://github.com/yourprofile/selenium-pytest-framework)
 
