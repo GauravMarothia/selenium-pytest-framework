@@ -1,0 +1,35 @@
+{
+  "dev": {
+    "base_url": "https://www.saucedemo.com",
+    "timeout": 10,
+    "api_url": "https://api.dev.example.com",
+    "database": {
+      "host": "dev-db.example.com",
+      "port": 5432
+    },
+    "retry_attempts": 2,
+    "screenshot_on_failure": true
+  },
+  "staging": {
+    "base_url": "https://www.saucedemo.com",
+    "timeout": 15,
+    "api_url": "https://api.staging.example.com",
+    "database": {
+      "host": "staging-db.example.com",
+      "port": 5432
+    },
+    "retry_attempts": 3,
+    "screenshot_on_failure": true
+  },
+  "prod": {
+    "base_url": "https://www.saucedemo.com",
+    "timeout": 20,
+    "api_url": "https://api.example.com",
+    "database": {
+      "host": "prod-db.example.com",
+      "port": 5432
+    },
+    "retry_attempts": 3,
+    "screenshot_on_failure": true
+  }
+}

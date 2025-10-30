@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Chrome browser tests
+  selenium-chrome:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: selenium-pytest-chrome
+    environment:
+      - BROWSER=chrome
+      - HEADLESS=true
+      - ENV=dev
+    volumes:
+      - ../reports:/app/reports
+      - ../logs:/app/logs
+      - ../screenshots:/app/screenshots
+    command: pytest -v -n auto --html=reports/chrome_report.html --self-contained-html
+
+  # Firefox browser tests
+  selenium-firefox:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: selenium-pytest-firefox
+    environment:
+      - BROWSER=firefox
+      - HEADLESS=true
+      - ENV=dev
+    volumes:
+      - ../reports:/app/reports
+      - ../logs:/app/logs
+      - ../screenshots:/app/screenshots
+    command: pytest -v --html=reports/firefox_report.html --self-contained-html
+
+  # Smoke tests only
+  smoke-tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: selenium-pytest-smoke
+    environment:
+      - BROWSER=chrome
+      - HEADLESS=true
+      - ENV=dev
+    volumes:
+      - ../reports:/app/reports
+      - ../logs:/app/logs
+      - ../screenshots:/app/screenshots
+    command: pytest -v -m smoke --html=reports/smoke_report.html --self-contained-html
+
+  # Regression tests
+  regression-tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: selenium-pytest-regression
+    environment:
+      - BROWSER=chrome
+      - HEADLESS=true
+      - ENV=staging
+    volumes:
+      - ../reports:/app/reports
+      - ../logs:/app/logs
+      - ../screenshots:/app/screenshots
+    command: pytest -v -m regression -n auto --html=reports/regression_report.html --self-contained-html
+
+# Usage:
+# Build: docker-compose -f docker/docker-compose.yml build
+# Run all: docker-compose -f docker/docker-compose.yml up
+# Run specific service: docker-compose -f docker/docker-compose.yml up selenium-chrome
+#

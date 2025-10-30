@@ -1,0 +1,244 @@
+name: Selenium PyTest CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to run tests'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - critical
+
+jobs:
+  test:
+    name: Run Selenium Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install Chrome
+        if: matrix.browser == 'chrome'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+      
+      - name: Install Firefox
+        if: matrix.browser == 'firefox'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+      
+      - name: Create directories
+        run: |
+          mkdir -p reports logs screenshots
+      
+      - name: Run smoke tests
+        env:
+          BROWSER: ${{ matrix.browser }}
+          HEADLESS: true
+          ENV: dev
+        run: |
+          pytest -v -m smoke \
+            --browser=${{ matrix.browser }} \
+            --headless \
+            --html=reports/smoke_report_${{ matrix.browser }}_py${{ matrix.python-version }}.html \
+            --self-contained-html \
+            --junit-xml=reports/junit_smoke_${{ matrix.browser }}.xml
+        continue-on-error: false
+      
+      - name: Run regression tests
+        if: github.event_name == 'push' || github.event_name == 'schedule'
+        env:
+          BROWSER: ${{ matrix.browser }}
+          HEADLESS: true
+          ENV: dev
+        run: |
+          pytest -v -m regression \
+            --browser=${{ matrix.browser }} \
+            --headless \
+            -n auto \
+            --html=reports/regression_report_${{ matrix.browser }}_py${{ matrix.python-version }}.html \
+            --self-contained-html \
+            --junit-xml=reports/junit_regression_${{ matrix.browser }}.xml
+        continue-on-error: true
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-reports-${{ matrix.browser }}-py${{ matrix.python-version }}
+          path: |
+            reports/
+            logs/
+            screenshots/
+          retention-days: 30
+      
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: failure-screenshots-${{ matrix.browser }}-py${{ matrix.python-version }}
+          path: screenshots/
+          retention-days: 7
+      
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: reports/junit_*.xml
+          check_name: Test Results - ${{ matrix.browser }} - Python ${{ matrix.python-version }}
+      
+      - name: Comment PR with results
+        uses: daun/pytest-coverage-comment@v1
+        if: github.event_name == 'pull_request'
+        with:
+          pytest-xml-coverage-path: reports/junit_*.xml
+
+  docker-test:
+    name: Run Tests in Docker
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        run: |
+          docker build -t selenium-pytest-framework -f docker/Dockerfile .
+      
+      - name: Run tests in Docker
+        run: |
+          docker run --rm \
+            -v $(pwd)/reports:/app/reports \
+            -v $(pwd)/logs:/app/logs \
+            -v $(pwd)/screenshots:/app/screenshots \
+            -e BROWSER=chrome \
+            -e HEADLESS=true \
+            -e ENV=dev \
+            selenium-pytest-framework pytest -v -m smoke
+      
+      - name: Upload Docker test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: docker-test-reports
+          path: |
+            reports/
+            logs/
+            screenshots/
+          retention-days: 30
+
+  parallel-execution:
+    name: Parallel Test Execution
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+      
+      - name: Run tests in parallel
+        env:
+          BROWSER: chrome
+          HEADLESS: true
+          ENV: dev
+        run: |
+          pytest -v -n auto \
+            --browser=chrome \
+            --headless \
+            --html=reports/parallel_report.html \
+            --self-contained-html
+      
+      - name: Upload parallel test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: parallel-test-reports
+          path: reports/
+          retention-days: 30
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [test, docker-test]
+    if: always()
+    
+    steps:
+      - name: Check test status
+        run: |
+          echo "Tests completed with status: ${{ needs.test.result }}"
+          echo "Docker tests completed with status: ${{ needs.docker-test.result }}"
+      
+      # Add your notification service here (Slack, Teams, Email, etc.)
+      # Example for Slack:
+      # - name: Slack Notification
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: 'Test execution completed'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}

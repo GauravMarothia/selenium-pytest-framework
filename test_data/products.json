@@ -1,0 +1,153 @@
+{
+  "products": [
+    {
+      "id": "sauce-labs-backpack",
+      "name": "Sauce Labs Backpack",
+      "description": "carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.",
+      "price": 29.99,
+      "category": "accessories",
+      "in_stock": true
+    },
+    {
+      "id": "sauce-labs-bike-light",
+      "name": "Sauce Labs Bike Light",
+      "description": "A red light isn't the desired state in testing but it sure helps when riding your bike at night.",
+      "price": 9.99,
+      "category": "accessories",
+      "in_stock": true
+    },
+    {
+      "id": "sauce-labs-bolt-t-shirt",
+      "name": "Sauce Labs Bolt T-Shirt",
+      "description": "Get your testing superhero on with the Sauce Labs bolt T-shirt.",
+      "price": 15.99,
+      "category": "clothing",
+      "in_stock": true
+    },
+    {
+      "id": "sauce-labs-fleece-jacket",
+      "name": "Sauce Labs Fleece Jacket",
+      "description": "It's not every day that you come across a midweight quarter-zip fleece jacket capable of handling everything.",
+      "price": 49.99,
+      "category": "clothing",
+      "in_stock": true
+    },
+    {
+      "id": "sauce-labs-onesie",
+      "name": "Sauce Labs Onesie",
+      "description": "Rib snap infant onesie for the junior automation engineer in development.",
+      "price": 7.99,
+      "category": "clothing",
+      "in_stock": true
+    },
+    {
+      "id": "test-allthethings-t-shirt-red",
+      "name": "Test.allTheThings() T-Shirt (Red)",
+      "description": "This classic Sauce Labs t-shirt is perfect to wear when cozying up to your keyboard.",
+      "price": 15.99,
+      "category": "clothing",
+      "in_stock": true
+    }
+  ],
+  "sort_options": [
+    {
+      "value": "az",
+      "label": "Name (A to Z)",
+      "description": "Sort products alphabetically by name ascending"
+    },
+    {
+      "value": "za",
+      "label": "Name (Z to A)",
+      "description": "Sort products alphabetically by name descending"
+    },
+    {
+      "value": "lohi",
+      "label": "Price (low to high)",
+      "description": "Sort products by price ascending"
+    },
+    {
+      "value": "hilo",
+      "label": "Price (high to low)",
+      "description": "Sort products by price descending"
+    }
+  ],
+  "product_categories": [
+    {
+      "name": "accessories",
+      "count": 2,
+      "products": ["sauce-labs-backpack", "sauce-labs-bike-light"]
+    },
+    {
+      "name": "clothing",
+      "count": 4,
+      "products": [
+        "sauce-labs-bolt-t-shirt",
+        "sauce-labs-fleece-jacket",
+        "sauce-labs-onesie",
+        "test-allthethings-t-shirt-red"
+      ]
+    }
+  ],
+  "price_ranges": {
+    "budget": {
+      "min": 0,
+      "max": 10,
+      "description": "Products under $10"
+    },
+    "mid_range": {
+      "min": 10,
+      "max": 30,
+      "description": "Products between $10-$30"
+    },
+    "premium": {
+      "min": 30,
+      "max": 100,
+      "description": "Products over $30"
+    }
+  },
+  "test_scenarios": {
+    "single_item_cart": {
+      "products": ["sauce-labs-backpack"],
+      "expected_total": 29.99,
+      "expected_count": 1
+    },
+    "multiple_items_cart": {
+      "products": [
+        "sauce-labs-backpack",
+        "sauce-labs-bike-light",
+        "sauce-labs-bolt-t-shirt"
+      ],
+      "expected_total": 55.97,
+      "expected_count": 3
+    },
+    "full_cart": {
+      "products": [
+        "sauce-labs-backpack",
+        "sauce-labs-bike-light",
+        "sauce-labs-bolt-t-shirt",
+        "sauce-labs-fleece-jacket",
+        "sauce-labs-onesie",
+        "test-allthethings-t-shirt-red"
+      ],
+      "expected_total": 129.94,
+      "expected_count": 6
+    },
+    "cheapest_items": {
+      "products": ["sauce-labs-onesie", "sauce-labs-bike-light"],
+      "expected_total": 17.98,
+      "expected_count": 2
+    },
+    "most_expensive_items": {
+      "products": ["sauce-labs-fleece-jacket", "sauce-labs-backpack"],
+      "expected_total": 79.98,
+      "expected_count": 2
+    }
+  },
+  "expected_product_count": 6,
+  "default_sort": "az",
+  "filters": {
+    "available_filters": ["category", "price_range", "sort"],
+    "category_options": ["accessories", "clothing"],
+    "sort_options": ["az", "za", "lohi", "hilo"]
+  }
+}

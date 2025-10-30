@@ -1,0 +1,34 @@
+# Core Testing Framework
+pytest==7.4.3
+pytest-html==4.1.1
+pytest-xdist==3.5.0
+pytest-rerunfailures==12.0
+
+# Selenium WebDriver
+selenium==4.15.2
+
+# Reporting
+allure-pytest==2.13.2
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+faker==20.1.0
+
+# Logging
+colorlog==6.8.0
+
+# Data Handling
+jsonschema==4.20.0
+pyyaml==6.0.1
+
+# Parallel Execution
+pytest-parallel==0.1.1
+
+# Code Quality (Optional for development)
+black==23.12.1
+flake8==7.0.0
+pylint==3.0.3
+
+# Browser Drivers (Selenium Manager handles this automatically in Selenium 4+)
+# webdriver-manager==4.0.1  # Optional: Alternative driver management

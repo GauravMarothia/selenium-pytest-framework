@@ -1,0 +1,101 @@
+{
+  "valid_users": [
+    {
+      "username": "standard_user",
+      "password": "secret_sauce",
+      "user_type": "standard",
+      "description": "Standard user with full access"
+    },
+    {
+      "username": "problem_user",
+      "password": "secret_sauce",
+      "user_type": "problem",
+      "description": "User with intentional UI issues"
+    },
+    {
+      "username": "performance_glitch_user",
+      "password": "secret_sauce",
+      "user_type": "performance",
+      "description": "User with performance delays"
+    }
+  ],
+  "locked_users": [
+    {
+      "username": "locked_out_user",
+      "password": "secret_sauce",
+      "user_type": "locked",
+      "description": "User account is locked"
+    }
+  ],
+  "invalid_users": [
+    {
+      "username": "invalid_user",
+      "password": "invalid_password",
+      "expected_error": "Username and password do not match"
+    },
+    {
+      "username": "",
+      "password": "secret_sauce",
+      "expected_error": "Username is required"
+    },
+    {
+      "username": "standard_user",
+      "password": "",
+      "expected_error": "Password is required"
+    },
+    {
+      "username": "",
+      "password": "",
+      "expected_error": "Username is required"
+    },
+    {
+      "username": "nonexistent_user",
+      "password": "wrong_password",
+      "expected_error": "Username and password do not match"
+    }
+  ],
+  "test_profiles": {
+    "admin": {
+      "username": "admin_user",
+      "password": "admin_pass123",
+      "role": "administrator",
+      "permissions": ["read", "write", "delete", "admin"]
+    },
+    "viewer": {
+      "username": "viewer_user",
+      "password": "viewer_pass123",
+      "role": "viewer",
+      "permissions": ["read"]
+    },
+    "editor": {
+      "username": "editor_user",
+      "password": "editor_pass123",
+      "role": "editor",
+      "permissions": ["read", "write"]
+    }
+  },
+  "user_credentials_mapping": {
+    "standard": {
+      "username": "standard_user",
+      "password": "secret_sauce",
+      "expected_redirect": "/inventory.html"
+    },
+    "locked": {
+      "username": "locked_out_user",
+      "password": "secret_sauce",
+      "expected_error": "Epic sadface: Sorry, this user has been locked out."
+    },
+    "problem": {
+      "username": "problem_user",
+      "password": "secret_sauce",
+      "expected_redirect": "/inventory.html",
+      "known_issues": ["Image loading issues", "Cart issues"]
+    },
+    "performance": {
+      "username": "performance_glitch_user",
+      "password": "secret_sauce",
+      "expected_redirect": "/inventory.html",
+      "expected_delay": "2-5 seconds"
+    }
+  }
+}
